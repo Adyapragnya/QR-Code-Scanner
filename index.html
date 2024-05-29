@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR Code Scanner</title>
+</head>
+<body>
+<h1>QR Code Scanner</h1>
+<video id="qr-video" width="35%" height="auto" autoplay playsinline></video>
+<script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+<script>
+navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+.then(function(stream) {
+  const video = document.getElementById('qr-video');
+  video.srcObject = stream;
+  video.setAttribute('playsinline', true);
+  video.play();
+
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  setInterval(() => {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    const code = jsQR(imageData.data, imageData.width, imageData.height);
+    if (code) {
+      alert('QR Code Scanned: ' + code.data);
+      // You can further process the scanned data here
+    }
+  }, 1000);
+})
+.catch(function(error) {
+  console.error('Error accessing camera:', error);
+});
+</script>
+</body>
+</html>
